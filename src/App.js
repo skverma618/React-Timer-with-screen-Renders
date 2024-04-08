@@ -1,60 +1,48 @@
-import { useState, useRef } from 'react';
+import { useReducer } from 'react';
+import Todo from "./Todo";
+
+const ACTION = {
+    INCREMENT: 'increment',
+    DECREMENT: 'decrement',
+    NEW_USER_INPUT: 'newUserInput',
+    TG_COLOR: 'tgColor'
+}
+
+const reducer = (state, action) => {
+    switch (action.type) {
+        case ACTION.INCREMENT:
+            return { ...state, count: state.count + 1 };
+        case ACTION.DECREMENT:
+            return { ...state, count: state.count - 1 };
+        case ACTION.NEW_USER_INPUT:
+            return { ...state, userInput: action.payload };
+        case ACTION.TG_COLOR:
+            return { ...state, color: !state.color };
+        default:
+            throw new Error();
+    }
+}
 
 function App() {
-    const [randomInput, setRandomInput] = useState('');
-    const [seconds, setSeconds] = useState(0);
-
-    const renders = useRef(0);
-    const inputRef = useRef();
-    const timerId = useRef();
-
-    const handleChange = (e) => {
-        setRandomInput(e.target.value);
-        renders.current++;
-    }
-
-    const startTimer = () => {
-        if(timerId.current) return; // If there already is a timer running, do nothing, otherwise, multiple setinterval will be created and the timer will run faster
-         timerId.current = setInterval( () => {
-             renders.current++;
-             setSeconds( seconds => seconds + 1);
-         }, 1000)
-        inputRef.current.focus();
-    }
-
-    const stopTimer = () => {
-        clearInterval(timerId.current);
-        timerId.current = 0;
-    }
-
-    const resetTimer = () => {
-        stopTimer();
-        if(seconds > 0){
-            renders.current++;
-            setSeconds(0);
-        }
-    }
+    const [state, dispatch] = useReducer(reducer, { count: 0, userInput: '', color: false })
 
     return (
-        <main className="App">
-            <input
-                ref={inputRef}
-                type="text"
-                value={randomInput}
-                placeholder="Random Input"
-                onChange={handleChange}
-            />
-            <p>Renders: {renders.current}</p>
-            <br /><br />
-            <section>
-                <button onClick={startTimer}>Start</button>
-                <button onClick={stopTimer}>Stop</button>
-                <button onClick={resetTimer}>Reset</button>
-            </section>
-            <br /><br />
-            <p>Seconds: {seconds}</p>
-            <br /><br />
-            <p>{randomInput}</p>
+        <main className="App" style={{ color: state.color ? '#FFF' : '#FFF952' }}>
+            {/*<input*/}
+            {/*    type="text"*/}
+            {/*    value={state.userInput}*/}
+            {/*    onChange={(e) => dispatch({ type: ACTION.NEW_USER_INPUT, payload: e.target.value })}*/}
+            {/*/>*/}
+            {/*<br /><br />*/}
+            {/*<p>{state.count}</p>*/}
+            {/*<section>*/}
+            {/*    <button onClick={(() => dispatch({ type: ACTION.DECREMENT }))}>-</button>*/}
+            {/*    <button onClick={(() => dispatch({ type: ACTION.INCREMENT }))}>+</button>*/}
+            {/*    <button onClick={(() => dispatch({ type: ACTION.TG_COLOR }))}>Color</button>*/}
+            {/*</section>*/}
+            {/*<br /><br />*/}
+            {/*<p>{state.userInput}</p>*/}
+            <Todo />
         </main>
     );
 }
